@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GB7 SEGUIDORES</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>GB7 SEGUIDORES</h1>
+    </header>
+    <main>
+        <section class="form-section">
+            <h2>Escolha o Serviço</h2>
+            <form id="service-form">
+                <label for="category">Categoria:</label>
+                <select id="category" name="category">
+                    <option value="followers">Instagram Seguidores</option>
+                    <option value="likes">Instagram Curtidas</option>
+                    <option value="followers-tiktok">TikTok Seguidores</option>
+                    <option value="likes-tiktok">TikTok Curtidas</option>
+                </select>
+
+                <label for="service">Serviço:</label>
+                <select id="service" name="service">
+                    <!-- Opções serão preenchidas pelo JavaScript -->
+                </select>
+
+                <label for="quantity">Quantidade:</label>
+                <input type="number" id="quantity" name="quantity" min="1" required>
+                
+                <p id="quantity-range" style="display: none;">Mín.: 20 - Máx.: 100 000</p>
+
+               
+                <p id="price-display">Preço: R$0,00</p>
+
+                <label for="link">Link:</label>
+                <input type="text" id="link" name="link" placeholder="Coloque o @ do perfil ou link da publicação" required>
+
+                <button type="submit">Comprar</button>
+            </form>
+        </section>
+    </main>
+    
+    <script>
+        const serviceSelect = document.getElementById('service');
+        const categorySelect = document.getElementById('category');
+        const quantityInput = document.getElementById('quantity');
+        const priceDisplay = document.getElementById('price-display');
+        const linkInput = document.getElementById('link');
+        const quantityRange = document.getElementById('quantity-range');
+        const form = document.getElementById('service-form');
+
+        const services = {
+            followers: [
+                { value: 'followers-brazil', text: 'Seguidores Brasileiros' },
+                { value: 'followers-global', text: 'Seguidores Mundiais' }
+            ],
+            likes: [
+                { value: 'likes-brazil', text: 'Curtidas Brasileiras' },
+                { value: 'likes-global', text: 'Curtidas Mundiais' }
+            ],
+            'followers-tiktok': [
+                { value: 'followers-brazil-tiktok', text: 'Seguidores Brasileiros TikTok' },
+                { value: 'followers-global-tiktok', text: 'Seguidores Mundiais TikTok' }
+            ],
+            'likes-tiktok': [
+                { value: 'likes-brazil-tiktok', text: 'Curtidas Brasileiras TikTok' },
+                { value: 'likes-global-tiktok', text: 'Curtidas Mundiais TikTok' }
+            ]
+        };
+
+        function updateServiceOptions() {
+            const category = categorySelect.value;
+            const options = services[category] || [];
+            serviceSelect.innerHTML = options.map(option => 
+                `<option value="${option.value}">${option.text}</option>`
+            ).join('');
+            // Atualiza a seleção do serviço com a primeira opção disponível, se houver
+            if (options.length > 0) {
+                serviceSelect.value = options[0].value;
+                updatePrice();
+                updateLinkPlaceholder();
+                updateQuantityRange();
+            } else {
+                serviceSelect.innerHTML = '<option value="">Nenhum serviço disponível</option>';
+                priceDisplay.textContent = 'Preço: R$0,00';
+                linkInput.placeholder = 'Coloque o @ do perfil ou link da publicação';
+                quantityRange.style.display = 'none'; // Esconde o intervalo quando não há opções
+            }
+        }
+
+        function updatePrice() {
+            const service = serviceSelect.value;
+            const quantity = parseInt(quantityInput.value) || 0;
+            let unitPrice;
+
+            if (service.startsWith('followers')) {
+                if (service.includes('tiktok')) {
+                    unitPrice = service.includes('brazil') ? 25 : 15; // Preços para seguidores TikTok
+                } else {
+                    unitPrice = service.includes('brazil') ? 40 : 10; // Preços para seguidores Instagram
+                }
+            } else if (service.startsWith('likes')) {
+                if (service.includes('tiktok')) {
+                    unitPrice = service.includes('brazil') ? 6 : 3; // Preços para curtidas TikTok
+                } else {
+                    unitPrice = service.includes('brazil') ? 6 : 3; // Preços para curtidas Instagram
+                }
+            }
+
+            const price = (quantity / 1000) * unitPrice;
+            priceDisplay.textContent = `Preço: R$${price.toFixed(2)}`;
+        }
+
+        function updateLinkPlaceholder() {
+            const category = categorySelect.value;
+            if (category.startsWith('followers')) {
+                linkInput.placeholder = 'Coloque o @ do perfil';
+            } else if (category.startsWith('likes')) {
+                linkInput.placeholder = 'Coloque o link da publicação';
+            }
+        }
+
+        function updateQuantityRange() {
+            const service = serviceSelect.value;
+            if (service === 'followers-brazil') {
+                quantityRange.style.display = 'block';
+            } else {
+                quantityRange.style.display = 'none';
+            }
+        }
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Previne o envio padrão do formulário
+
+            const service = serviceSelect.options[serviceSelect.selectedIndex].text;
+            const quantity = quantityInput.value;
+            const link = linkInput.value;
+            const message = `Olá, gostaria de comprar ${quantity} de ${service}. Link: ${link}`;
+
+            // Substitua 'SeuNúmeroWhatsapp' pelo seu número do WhatsApp com o código do país e código de área
+            const whatsappNumber = '5533998363769';
+            const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+            window.location.href = whatsappURL;
+        });
+
+        categorySelect.addEventListener('change', () => {
+            updateServiceOptions();
+            updateLinkPlaceholder();
+        });
+
+        serviceSelect.addEventListener('change', () => {
+            updatePrice();
+            updateQuantityRange();
+        });
+
+        quantityInput.addEventListener('input', updatePrice);
+
+        // Inicializa as opções de serviço com base na categoria padrão
+        updateServiceOptions();
+        updateLinkPlaceholder();
+    </script>
+</body>
+</html>
